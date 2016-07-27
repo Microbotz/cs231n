@@ -65,7 +65,10 @@ def sgd_momentum(w, dw, config=None):
   # TODO: Implement the momentum update formula. Store the updated value in   #
   # the next_w variable. You should also use and update the velocity v.       #
   #############################################################################
-  pass
+  mu = config["momentum"]
+  lr = config["learning_rate"]
+  v = mu*v - lr*dw
+  next_w = w + v
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -99,11 +102,16 @@ def rmsprop(x, dx, config=None):
   # in the next_x variable. Don't forget to update cache value stored in      #  
   # config['cache'].                                                          #
   #############################################################################
-  pass
+  cache = config["cache"]
+  decay_rate = config["decay_rate"]
+  lr = config["learning_rate"]
+  eps = config["epsilon"]
+  cache = decay_rate * cache + (1 - decay_rate) * dx**2
+  next_x = x - lr * dx / (np.sqrt(cache) + eps)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
-
+  config["cache"] = cache
   return next_x, config
 
 
@@ -136,10 +144,24 @@ def adam(x, dx, config=None):
   # the next_x variable. Don't forget to update the m, v, and t variables     #
   # stored in config.                                                         #
   #############################################################################
-  pass
+  lr = config["learning_rate"]
+  m = config["m"]
+  v = config["v"]
+  t = config["t"]
+  beta1 = config["beta1"]
+  beta2 = config["beta2"]
+  eps = config["epsilon"]
+  
+  t += 1
+  m = (beta1 * m + (1 - beta1) * dx) 
+  mh = m / (1 - beta1**t)
+  v = (beta2 * v + (1 - beta2) * dx**2)
+  vh = v / (1 - beta2**t)
+  next_x = x - lr * mh / (np.sqrt(vh) + eps)  
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
+  config["t"], config["v"], config["m"] = t, v, m
   
   return next_x, config
 
